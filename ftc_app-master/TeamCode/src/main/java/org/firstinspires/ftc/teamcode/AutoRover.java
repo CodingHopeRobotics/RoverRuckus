@@ -55,7 +55,7 @@ import com.qualcomm.robotcore.util.Range;
 /*
 Autonomous with Depot and Crater
  */
-@Autonomous(name="AutoRover", group="Linear Opmode")
+@Autonomous(name="AutoRoverLatch", group="Linear Opmode")
 //@Disabled
 public class AutoRover extends LinearOpMode {
 
@@ -66,13 +66,13 @@ public class AutoRover extends LinearOpMode {
     private DcMotor rightLift = null;  // 2 Arm Lift
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
 
         hookServo = hardwareMap.get(Servo.class, "hookServo");
         //hookServo.setPosition(0);
         //2 Wheel Drive
-        leftDrive  = hardwareMap.get(DcMotor.class, "leftMotor");
-        rightDrive = hardwareMap.get(DcMotor.class, "rightMotor");
+        leftDrive  = hardwareMap.get(DcMotor.class, "leftDrive");
+        rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
         //invert
         leftDrive.setDirection(DcMotor.Direction.FORWARD);
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -85,11 +85,13 @@ public class AutoRover extends LinearOpMode {
 
         waitForStart();
 
+        double liftPower = 0.5;
+
         while (opModeIsActive()) {
 
             //Drop from lander
-            leftLift.setPower(1);
-            rightLift.setPower(1);
+            leftLift.setPower(liftPower);
+            rightLift.setPower(liftPower);
             sleep( 2000);
             leftLift.setPower(0);
             rightLift.setPower(0);
@@ -106,23 +108,16 @@ public class AutoRover extends LinearOpMode {
             sleep(250);
 
             //Lower Arm
-            leftLift.setPower(1);
-            rightLift.setPower(1);
+            leftLift.setPower(liftPower);
+            rightLift.setPower(liftPower);
             sleep( 750);
 
             leftLift.setPower(0);
             rightLift.setPower(0);
 
             //straighten robot
-            leftDrive.setPower(-0.5);
-            rightDrive.setPower(-0.5);
-            sleep(500);
-
-            leftDrive.setPower(0);
-            rightDrive.setPower(0);
-
-            leftDrive.setPower(0.5);
-            rightDrive.setPower(-0.5);
+            leftDrive.setPower(liftPower);
+            rightDrive.setPower(-liftPower);
             sleep(500);
 
             leftDrive.setPower(0);
@@ -132,7 +127,6 @@ public class AutoRover extends LinearOpMode {
              */
             leftDrive.setPower(-0.5);
             rightDrive.setPower(-0.5);
-
             sleep(2000);
 
             leftDrive.setPower(0);
@@ -145,23 +139,39 @@ public class AutoRover extends LinearOpMode {
 
             leftDrive.setPower(0.2);
             rightDrive.setPower(0.2);
-
             sleep(500);
 
             leftDrive.setPower(0);
             rightDrive.setPower(0);
 
             //Retract Lift Arm
-            leftLift.setPower(1);
-            rightLift.setPower(1);
+            leftLift.setPower(liftPower);
+            rightLift.setPower(liftPower);
             sleep( 2000);
 
             leftLift.setPower(0);
             rightLift.setPower(0);
+
             /*
             Park In Crater
              */
+            //Turn toward Crater
+            leftDrive.setPower(0.5);
+            rightDrive.setPower(-0.5);
+            sleep(2000);
 
+            leftDrive.setPower(0);
+            rightDrive.setPower(0);
+
+            sleep(250);
+            //Drive to Crater
+            leftDrive.setPower(1);
+            rightDrive.setPower(1);
+
+            sleep(2000);
+            //Park
+            leftDrive.setPower(0);
+            rightDrive.setPower(0);
 
 
 

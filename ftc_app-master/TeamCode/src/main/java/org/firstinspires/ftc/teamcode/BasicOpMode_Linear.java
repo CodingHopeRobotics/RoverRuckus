@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -51,153 +51,127 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="RoverRuckus", group="Linear Opmode")
+@TeleOp(name="RoverRuckus2", group="Linear Opmode")
 //@Disabled
 public class BasicOpMode_Linear extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     /*
-    *
     * 2 Wheel Drive
-    *
-    * */
+    */
     private DcMotor leftDrive = null;
     private DcMotor rightDrive = null;
 
     /*
-    *
     * 2 Arms to lift the robot
-    *
-    * */
+     */
     private DcMotor leftLift = null;
     private DcMotor rightLift = null;
 
-
-
     /*
-    *
     * Intake Motor at the front of the arm
-    *
-    * */
-
+    */
     private DcMotor intakeMotor = null;
 
     /*
-    *
     * Servo to place the marker
-    *
-    * */
-
-    private Servo markerServo = null;
+    */
+    private Servo hookServo = null;
     private double dumpPosition = 0;
 
     @Override
     public void runOpMode() {
 
         /*
-        *
         * Marker Servo
-        *
-        * */
-        markerServo = hardwareMap.get(Servo.class, "markerServo");
+        */
+        hookServo = hardwareMap.get(Servo.class, "hookServo");
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         /*
-        *
         * 2 Wheel Drive
-        *
-        * */
-        leftDrive  = hardwareMap.get(DcMotor.class, "leftMotor");
-        rightDrive = hardwareMap.get(DcMotor.class, "rightMotor");
+        */
+        leftDrive  = hardwareMap.get(DcMotor.class, "leftDrive");
+        rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
         //invert
         leftDrive.setDirection(DcMotor.Direction.FORWARD);
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
 
-
         /*
-        *
         * 2 Arm Lift
-        *
-        * */
-
+        */
         leftLift  = hardwareMap.get(DcMotor.class, "leftLift");
         rightLift = hardwareMap.get(DcMotor.class, "rightLift");
         //invert
         leftLift.setDirection(DcMotor.Direction.FORWARD);
         rightLift.setDirection(DcMotor.Direction.REVERSE);
 
-        leftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //leftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //rightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         /*
-        *
         * Intake Motor
-        *
-        * */
+        */
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
 
         /*
-        *
         * Wait for the game to start (driver presses PLAY)
-        *
-        * */
+         */
         waitForStart();
         runtime.reset();
 
         /*
-        *
         * run until the end of the match (driver presses STOP)
-        *
-        * */
-
+        */
         while (opModeIsActive()) {
 
             /*
-            *
             * Wheel Mechanics
-            *
-            * */
+            */
             double leftPower;
             double rightPower;
 
             leftPower  = gamepad1.left_stick_y * 3 / 4;
             rightPower = gamepad1.right_stick_y * 3 /4;
-
             // Send calculated power to wheels
             leftDrive.setPower(leftPower);
             rightDrive.setPower(rightPower);
 
-
-
             /*
-            *
             * Intake Motor Mechanics
-            *
-            * */
-            if(gamepad1.left_trigger == 1){//out
-                intakeMotor.setPower(1.0);
+            */
+            if(gamepad1.dpad_up){//out
+                intakeMotor.setPower(0.3);
             }else{
-                if(gamepad1.right_trigger == 1){//in
-                    intakeMotor.setPower(-1.0);
+                if(gamepad1.dpad_down){//in
+                    intakeMotor.setPower(-0.3);
                 }else{
                     intakeMotor.setPower(0);
                 }
             }
 
             /*
-            *
-            * 2 arm lift
-            *
-            * */
+            * 2 Arm Lift Mechanics
+            */
+            if(gamepad1.left_trigger == 1){//up
+                leftLift.setPower(0.5);
+                rightLift.setPower(0.5);
+            }else{
+                if(gamepad1.right_trigger==1){
+                    leftLift.setPower(-0.5);
+                    rightLift.setPower(-0.5);
+                }else{
+                    leftLift.setPower(0);
+                    rightLift.setPower(0);
+                }
+            }
 
-
-                //markerServo.setPosition(dumpPosition);
-
-
-            // Show the elapsed game time and wheel power.
-            //telemetry.addData("Lift Position", "Lift is at" + liftMotor.getCurrentPosition());
+            /*
+             Show the elapsed game time and wheel power.
+              */
+            telemetry.addData("Lift Position", "Lift is at" + leftLift.getCurrentPosition());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
             telemetry.update();
